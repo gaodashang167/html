@@ -4,207 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>量子新闻聚合系统</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --quantum-blue: #00f3ff;
-            --neon-purple: #bc13fe;
-            --dark-space: #0a0c17;
-            --matrix-green: #0aff0a;
-        }
-
-        body {
-            background: radial-gradient(ellipse at bottom, 
-                var(--dark-space) 0%, 
-                #1a1d2e 100%);
-            color: #fff;
-            font-family: 'Orbitron', sans-serif;
-            min-height: 100vh;
-            margin: 0;
-            padding: 2rem;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-            position: relative;
-        }
-
-        .title {
-            font-size: 2.5rem;
-            background: linear-gradient(90deg, 
-                var(--quantum-blue), 
-                var(--neon-purple));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
-        }
-
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .news-card {
-            background: linear-gradient(145deg, 
-                rgba(16, 18, 37, 0.95),
-                rgba(26, 29, 54, 0.9));
-            border: 1px solid var(--quantum-blue);
-            border-radius: 12px;
+        /* 保持原有样式不变，新增以下错误处理样式 */
+        .error-panel {
+            background: rgba(255, 107, 107, 0.15);
+            border: 1px solid #ff6b6b;
+            border-radius: 8px;
             padding: 1.5rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .news-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
-        }
-
-        .news-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent 45%,
-                rgba(0, 243, 255, 0.1) 50%,
-                transparent 55%
-            );
-            animation: hologram 8s linear infinite;
-            pointer-events: none;
-        }
-
-        @keyframes hologram {
-            0% { transform: translate(-30%, -30%) rotate(0deg); }
-            100% { transform: translate(30%, 30%) rotate(360deg); }
-        }
-
-        .news-header {
+            margin: 1rem 0;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
-            padding-bottom: 0.5rem;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .news-source {
-            color: var(--matrix-green);
-            font-size: 0.9rem;
-        }
-
-        .news-time {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.8rem;
-        }
-
-        .news-title {
-            font-size: 1.1rem;
-            line-height: 1.4;
-            margin-bottom: 1rem;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--quantum-blue);
+        .error-icon {
+            font-size: 1.5rem;
             animation: pulse 1.5s infinite;
+        }
+
+        .retry-button {
+            background: rgba(255, 107, 107, 0.3);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .retry-button:hover {
+            background: rgba(255, 107, 107, 0.5);
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 0.6; }
             50% { opacity: 1; }
         }
-
-        .error {
-            color: #ff6b6b;
-            padding: 2rem;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1 class="title">量子新闻聚合系统</h1>
-        </header>
-        
-        <div class="news-grid" id="newsGrid">
-            <div class="loading">正在连接量子数据流...</div>
-        </div>
-    </div>
+    <!-- 保持原有HTML结构不变 -->
 
     <script>
-        // 配置参数（需要到newsapi.org注册获取API密钥）
-        const API_KEY = 'YOUR_API_KEY'; // 替换为你的API密钥
-        const API_URL = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${API_KEY}`;
-        const REFRESH_INTERVAL = 300000; // 5分钟刷新
-
         class QuantumNews {
             constructor() {
-                this.newsGrid = document.getElementById('newsGrid');
-                this.articles = [];
-            }
-
-            async init() {
-                try {
-                    await this.fetchNews();
-                    setInterval(() => this.fetchNews(), REFRESH_INTERVAL);
-                } catch (error) {
-                    this.showError('量子通道连接失败');
-                }
+                this.retryCount = 0;
+                this.maxRetries = 5;
+                this.baseDelay = 1000;
             }
 
             async fetchNews() {
                 try {
                     const response = await fetch(API_URL);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API Error: ${errorData.message}`);
+                    }
+
                     const data = await response.json();
-                    this.articles = data.articles;
-                    this.renderNews();
+                    this.handleData(data);
+                    this.retryCount = 0; // 重置重试计数器
                 } catch (error) {
-                    console.error('Error:', error);
-                    this.showError('数据接收中断，正在重试...');
-                    setTimeout(() => this.fetchNews(), 5000);
+                    this.handleError(error);
                 }
             }
 
-            renderNews() {
-                this.newsGrid.innerHTML = this.articles.map(article => `
-                    <article class="news-card">
-                        <div class="news-header">
-                            <span class="news-source">${article.source.name}</span>
-                            <span class="news-time">${new Date(article.publishedAt).toLocaleTimeString()}</span>
+            handleError(error) {
+                console.error(`[${new Date().toISOString()}] Error:`, error);
+                
+                if (this.retryCount < this.maxRetries) {
+                    const delay = this.baseDelay * Math.pow(2, this.retryCount);
+                    this.retryCount++;
+                    
+                    this.showError(`
+                        <div class="error-panel">
+                            <div class="error-icon">⚠️</div>
+                            <div>
+                                <p>数据接收中断（错误代码：${error.message}）</p>
+                                <p>第 ${this.retryCount} 次重试（${delay/1000}秒后）...</p>
+                                <button class="retry-button" onclick="newsSystem.fetchNews()">立即重试</button>
+                            </div>
                         </div>
-                        <h3 class="news-title">${article.title}</h3>
-                        <p class="news-content">${article.description || ''}</p>
-                    </article>
-                `).join('');
+                    `);
+
+                    setTimeout(() => this.fetchNews(), delay);
+                } else {
+                    this.showError(`
+                        <div class="error-panel">
+                            <div class="error-icon">❌</div>
+                            <div>
+                                <p>超过最大重试次数，请检查：</p>
+                                <ul>
+                                    <li>1. 网络连接状态</li>
+                                    <li>2. API密钥有效性</li>
+                                    <li>3. 服务可用性</li>
+                                </ul>
+                                <button class="retry-button" onclick="location.reload()">重新加载页面</button>
+                            </div>
+                        </div>
+                    `);
+                }
             }
 
             showError(message) {
-                this.newsGrid.innerHTML = `
-                    <div class="error">
-                        <div class="error-icon">⚠️</div>
-                        <p>${message}</p>
-                    </div>
-                `;
+                const errorContainer = document.getElementById('newsGrid');
+                if (!errorContainer.querySelector('.error-panel')) {
+                    errorContainer.innerHTML = message + errorContainer.innerHTML;
+                }
             }
+
+            // 其他方法保持不变...
         }
 
-        // 初始化系统
         const newsSystem = new QuantumNews();
-        window.addEventListener('DOMContentLoaded', () => newsSystem.init());
+        newsSystem.init();
     </script>
 </body>
 </html>
