@@ -335,31 +335,13 @@
     <ul id="weibo-news"></ul>
 </section>
 
-<script>
-    function fetchWeiboHotNews() {
-        const script = document.createElement("script");
-        script.src = "https://weibo.com/ajax/statuses/hot_band?callback=showWeiboNews";
-        document.body.appendChild(script);
-    }
+<section class="news-section">
+    <h2>微博热点新闻</h2>
+    <p>点击查看最新微博热点 👉 
+        <a href="https://s.weibo.com/top/summary" target="_blank" style="color: var(--primary); font-weight: bold;">微博热搜榜</a>
+    </p>
+</section>
 
-    function showWeiboNews(data) {
-        const newsList = document.getElementById("weibo-news");
-        newsList.innerHTML = "";
-
-        if (!data.data || !data.data.band_list) {
-            newsList.innerHTML = "<p>无法加载微博热点新闻。</p>";
-            return;
-        }
-
-        data.data.band_list.slice(0, 10).forEach(item => {
-            const li = document.createElement("li");
-            li.innerHTML = `<a href="https://s.weibo.com/weibo?q=${encodeURIComponent(item.word)}" target="_blank">${item.word}</a>`;
-            newsList.appendChild(li);
-        });
-    }
-
-    fetchWeiboHotNews();
-</script>
 
 
 
