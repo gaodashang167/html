@@ -1,36 +1,46 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>现代企业 - 高端解决方案</title>
+    <meta name="description" content="TechVision - 全球领先的企业级数字化解决方案提供商">
+    <title>TechVision | 智能未来解决方案</title>
     <style>
+        :root {
+            --primary: #64ffda;
+            --secondary: #00ff88;
+            --dark: #0a192f;
+            --light: #ccd6f6;
+            --accent: rgba(100, 255, 218, 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            background: #0a192f;
-            color: #ccd6f6;
+            background: var(--dark);
+            color: var(--light);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        /* 导航栏 */
+        /* 动态导航栏 */
         .navbar {
             position: fixed;
             width: 100%;
-            padding: 20px 50px;
-            background: rgba(10, 25, 47, 0.85);
-            backdrop-filter: blur(10px);
+            padding: 1.5rem 5%;
+            background: rgba(10, 25, 47, 0.95);
+            backdrop-filter: blur(12px);
             z-index: 1000;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .nav-content {
-            max-width: 1200px;
+            max-width: 1440px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -38,174 +48,281 @@
         }
 
         .logo {
-            font-size: 28px;
+            font-size: 1.75rem;
             font-weight: 700;
-            color: #64ffda;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        /* 移动端菜单 */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .bar {
+            display: block;
+            width: 28px;
+            height: 2px;
+            margin: 6px 0;
+            background: var(--primary);
+            transition: 0.3s;
         }
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 2.5rem;
         }
 
         .nav-links a {
-            color: #ccd6f6;
+            color: var(--light);
             text-decoration: none;
-            transition: color 0.3s;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
         }
 
-        .nav-links a:hover {
-            color: #64ffda;
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
         }
 
-        /* 主页大图 */
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* 英雄区块 */
         .hero {
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(45deg, rgba(10,25,47,0.9), rgba(10,25,47,0.7)),
-                        url('https://source.unsplash.com/random/1920x1080/?tech') center/cover;
+            background: linear-gradient(45deg, rgba(10,25,47,0.95), rgba(10,25,47,0.85)),
+                        url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1920&q=80') center/cover;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent 25%,
+                rgba(100, 255, 218, 0.1) 50%,
+                transparent 75%);
+            animation: hologram 12s infinite linear;
+            pointer-events: none;
         }
 
         .hero-content {
             text-align: center;
-            padding: 0 20px;
+            padding: 0 5%;
+            z-index: 1;
         }
 
         .hero h1 {
             font-size: 4rem;
-            margin-bottom: 20px;
-            animation: slideUp 1s ease;
+            margin-bottom: 1.5rem;
+            animation: fadeUp 1s ease;
+            background: linear-gradient(45deg, var(--light), var(--primary));
+            -webkit-background-clip: text;
+            color: transparent;
         }
 
-        .hero p {
+        /* 世界时间组件 */
+        .global-time {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            background: rgba(10, 25, 47, 0.9);
+            border: 1px solid rgba(100, 255, 218, 0.3);
+            box-shadow: 0 12px 48px rgba(16, 24, 39, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .global-time:hover {
+            transform: translateY(-5px);
+        }
+
+        .time-card {
+            margin: 1rem 0;
+        }
+
+        .time-card h4 {
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .digital-clock {
+            font-family: 'Fira Code', monospace;
             font-size: 1.5rem;
-            max-width: 600px;
-            margin: 0 auto;
-            color: #8892b0;
+            letter-spacing: 2px;
+            color: var(--primary);
         }
 
-        /* 内容区块 */
-        .section {
-            padding: 100px 20px;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid rgba(136, 146, 176, 0.1);
+        .timezone {
+            color: var(--light);
+            opacity: 0.8;
+            font-size: 0.85rem;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        /* 动画效果 */
+        @keyframes hologram {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(50%, 50%) rotate(360deg); }
         }
 
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
-        }
-
-        .card {
-            background: rgba(17, 34, 64, 0.5);
-            padding: 30px;
-            border-radius: 10px;
-            transition: transform 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-        }
-
-        /* 动画 */
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(2rem); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* 响应式设计 */
         @media (max-width: 768px) {
-            .navbar {
-                padding: 15px 20px;
+            .menu-toggle {
+                display: block;
             }
-            
+
             .nav-links {
-                display: none;
+                position: fixed;
+                top: 5rem;
+                right: -100%;
+                flex-direction: column;
+                background: rgba(10, 25, 47, 0.98);
+                padding: 2rem;
+                border-radius: 1rem;
+                width: 70%;
+                transition: right 0.3s ease;
+            }
+
+            .nav-links.active {
+                right: 5%;
             }
 
             .hero h1 {
                 font-size: 2.5rem;
             }
+
+            .global-time {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
+    <nav class="navbar" aria-label="Main navigation">
         <div class="nav-content">
             <div class="logo">TechVision</div>
+            <button class="menu-toggle" aria-expanded="false">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
             <div class="nav-links">
-                <a href="#home">首页</a>
-                <a href="#about">关于</a>
-                <a href="#services">服务</a>
-                <a href="#contact">联系</a>
+                <a href="#home">战略愿景</a>
+                <a href="#solutions">解决方案</a>
+                <a href="#innovation">技术创新</a>
+                <a href="#contact">全球合作</a>
             </div>
         </div>
     </nav>
 
     <section class="hero" id="home">
         <div class="hero-content">
-            <h1>创新驱动未来</h1>
-            <p>为企业提供智能化解决方案与数字化转型服务</p>
+            <h1>重塑商业未来</h1>
+            <p>赋能全球企业数字化转型</p>
         </div>
-    </section>
-
-    <section class="section" id="services">
-        <div class="container">
-            <h2>核心服务</h2>
-            <div class="card-grid">
-                <div class="card">
-                    <h3>人工智能解决方案</h3>
-                    <p>深度学习和机器学习驱动的智能系统开发</p>
-                </div>
-                <div class="card">
-                    <h3>云端架构设计</h3>
-                    <p>安全可靠的云端基础设施搭建与优化</p>
-                </div>
-                <div class="card">
-                    <h3>数据战略咨询</h3>
-                    <p>从数据采集到商业智能的全流程规划</p>
-                </div>
+        
+        <!-- 世界时间组件 -->
+        <div class="global-time">
+            <div class="time-card" data-city="UTC">
+                <h4>GLOBAL HQ</h4>
+                <div class="digital-clock">00:00:00</div>
+                <div class="timezone">GMT+00:00</div>
+            </div>
+            <div class="time-card" data-city="America/New_York">
+                <h4>NEW YORK</h4>
+                <div class="digital-clock">00:00:00</div>
+                <div class="timezone">EST</div>
+            </div>
+            <div class="time-card" data-city="Asia/Shanghai">
+                <h4>SHANGHAI</h4>
+                <div class="digital-clock">00:00:00</div>
+                <div class="timezone">CST</div>
             </div>
         </div>
     </section>
 
     <script>
-        // 滚动动画
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'slideUp 1s ease forwards';
-                }
-            });
-        }, { threshold: 0.1 });
+        // 移动端菜单切换
+        document.querySelector('.menu-toggle').addEventListener('click', () => {
+            document.querySelector('.nav-links').classList.toggle('active');
+            document.querySelector('.menu-toggle').setAttribute('aria-expanded', 
+                document.querySelector('.nav-links').classList.contains('active'));
+        });
 
-        document.querySelectorAll('.card').forEach((el) => observer.observe(el));
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // 动态时间更新
+        function updateWorldTime() {
+            document.querySelectorAll('.time-card').forEach(card => {
+                const options = {
+                    timeZone: card.dataset.city,
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                };
+                
+                const timeString = new Date().toLocaleTimeString('en-US', options);
+                const tzString = new Intl.DateTimeFormat('en-US', {
+                    timeZone: card.dataset.city,
+                    timeZoneName: 'short'
+                }).formatToParts(new Date()).find(part => part.type === 'timeZoneName').value;
+
+                card.querySelector('.digital-clock').textContent = timeString;
+                card.querySelector('.timezone').textContent = tzString;
+            });
+        }
+
+        // 初始化时间更新
+        setInterval(updateWorldTime, 1000);
+        updateWorldTime();
 
         // 导航栏交互
         window.addEventListener('scroll', () => {
             const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.style.background = 'rgba(10, 25, 47, 0.95)';
-            } else {
-                navbar.style.background = 'rgba(10, 25, 47, 0.85)';
-            }
+            navbar.style.background = window.scrollY > 50 
+                ? 'rgba(10, 25, 47, 0.98)' 
+                : 'rgba(10, 25, 47, 0.95)';
         });
     </script>
 </body>
