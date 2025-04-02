@@ -1,150 +1,181 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>实时新闻聚合平台（调试版）</title>
-    <style>
-        /* 调试样式 */
-        .debug-console {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.9);
-            color: #00ff88;
-            padding: 1rem;
-            font-family: monospace;
-            z-index: 9999;
-            max-height: 200px;
-            overflow-y: auto;
+<!-- 在 </section class="hero"> 之后添加新闻板块 -->
+<section class="news-section" id="news">
+    <div class="news-container">
+        <h2 class="section-title">实时要闻</h2>
+        <div class="news-grid" id="weiboNews"></div>
+    </div>
+</section>
+
+<style>
+    /* 新增新闻板块样式 */
+    .news-section {
+        padding: 8rem 5%;
+        background: rgba(10, 25, 47, 0.95);
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        color: transparent;
+        margin-bottom: 3rem;
+        text-align: center;
+        animation: fadeUp 1s ease;
+    }
+
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .news-card {
+        background: rgba(17, 34, 64, 0.7);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--primary);
+        transition: transform 0.3s ease;
+    }
+
+    .news-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .news-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+    }
+
+    .news-platform {
+        color: var(--primary);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .news-time {
+        color: var(--light);
+        opacity: 0.8;
+        font-size: 0.8rem;
+    }
+
+    .news-title {
+        font-size: 1.1rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .news-stats {
+        display: flex;
+        gap: 1.5rem;
+        color: var(--light);
+        opacity: 0.8;
+        font-size: 0.9rem;
+    }
+
+    .hot-tag {
+        background: rgba(255, 86, 86, 0.2);
+        color: #ff5656;
+        padding: 0.2rem 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+    }
+
+    @media (max-width: 768px) {
+        .news-section {
+            padding: 4rem 5%;
         }
         
-        /* 原有样式保持不变... */
-    </style>
-</head>
-<body>
-    <!-- 调试控制台 -->
-    <div class="debug-console" id="debugConsole"></div>
-
-    <script>
-        // 调试日志系统
-        const debug = {
-            log: (message) => {
-                const console = document.getElementById('debugConsole');
-                const entry = document.createElement('div');
-                entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-                console.appendChild(entry);
-                console.scrollTop = console.scrollHeight;
-            },
-            clear: () => {
-                document.getElementById('debugConsole').innerHTML = '';
-            }
-        };
-
-        // 启动调试
-        debug.log('开始初始化...');
-
-        // 增强版新闻生成器（带错误处理）
-        class NewsGenerator {
-            constructor() {
-                debug.log('新闻生成器实例创建');
-                try {
-                    this.newsPool = this.initializeNewsPool();
-                    this.initContainer();
-                    this.startUpdate();
-                } catch (error) {
-                    debug.log(`初始化失败: ${error}`);
-                    this.showErrorMessage();
-                }
-            }
-
-            initializeNewsPool() {
-                debug.log('正在初始化新闻数据池...');
-                return {
-                    zhihu: this.generateInitialData('zhihu', 3),
-                    weibo: this.generateInitialData('weibo', 3),
-                    douyin: this.generateInitialData('douyin', 2)
-                };
-            }
-
-            generateInitialData(platform, count) {
-                debug.log(`生成初始数据: ${platform}`);
-                return Array.from({length: count}, (_, i) => ({
-                    id: Date.now() + i,
-                    title: this.generateTitle(platform),
-                    ...this.generateInteractionData(platform),
-                    timestamp: Date.now()
-                }));
-            }
-
-            initContainer() {
-                debug.log('正在初始化DOM容器...');
-                try {
-                    const container = document.createElement('div');
-                    container.className = 'news-container';
-                    container.innerHTML = `
-                        <nav class="news-nav">
-                            <div class="news-tab active">热门</div>
-                            <div class="news-tab">最新</div>
-                            <div class="news-tab">关注</div>
-                        </nav>
-                        <div id="newsContent"></div>
-                    `;
-                    document.body.insertBefore(container, document.querySelector('.debug-console'));
-                    debug.log('DOM容器初始化成功');
-                } catch (error) {
-                    debug.log(`DOM初始化错误: ${error}`);
-                    throw new Error('DOM操作失败');
-                }
-            }
-
-            // 其他方法保持不变，添加错误处理...
-
-            showErrorMessage() {
-                const errorDiv = document.createElement('div');
-                errorDiv.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    padding: 2rem;
-                    background: #ff4757;
-                    color: white;
-                    border-radius: 8px;
-                    text-align: center;
-                `;
-                errorDiv.innerHTML = `
-                    <h2>内容加载失败</h2>
-                    <p>请检查以下可能原因：</p>
-                    <ul>
-                        <li>浏览器不支持JavaScript</li>
-                        <li>网络连接异常</li>
-                        <li>系统资源不足</li>
-                    </ul>
-                    <button onclick="location.reload()">重新加载</button>
-                `;
-                document.body.appendChild(errorDiv);
-            }
+        .section-title {
+            font-size: 2rem;
         }
+    }
+</style>
 
-        // 启动应用
-        debug.log('准备启动新闻生成器...');
-        document.addEventListener('DOMContentLoaded', () => {
-            debug.log('DOM加载完成');
-            try {
-                window.newsGen = new NewsGenerator();
-                debug.log('应用启动成功');
-            } catch (error) {
-                debug.log(`启动失败: ${error}`);
+<script>
+    // 模拟微博新闻API数据
+    const mockWeiboNews = [
+        {
+            id: 1,
+            title: "联合国点赞中国新能源发展",
+            reads: 1296000,
+            comments: 21000,
+            time: "2024-04-02T15:30:00",
+            hot: true
+        },
+        {
+            id: 2,
+            title: "东都战区再发军事行动海报",
+            reads: 893000,
+            comments: 14000,
+            time: "2024-04-02T15:25:00"
+        },
+        // 更多模拟数据...
+    ];
+
+    // 渲染新闻卡片
+    function renderNews(newsData) {
+        const container = document.getElementById('weiboNews');
+        container.innerHTML = newsData.map(item => `
+            <div class="news-card">
+                <div class="news-header">
+                    <span class="news-platform">微博热搜</span>
+                    <span class="news-time">${new Date(item.time).toLocaleTimeString('zh-CN')}</span>
+                </div>
+                ${item.hot ? '<span class="hot-tag">爆</span>' : ''}
+                <h3 class="news-title">${item.title}</h3>
+                <div class="news-stats">
+                    <span>阅读 ${formatNumber(item.reads)}</span>
+                    <span>讨论 ${formatNumber(item.comments)}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 数字格式化
+    function formatNumber(num) {
+        return num >= 10000 ? `${(num/10000).toFixed(1)}万` : num;
+    }
+
+    // 模拟实时更新
+    let currentPage = 1;
+    function fetchNews() {
+        // 模拟API分页请求
+        const newNews = mockWeiboNews.slice((currentPage-1)*3, currentPage*3);
+        renderNews(newNews);
+        currentPage = currentPage > 1 ? 1 : currentPage+1;
+    }
+
+    // 初始加载
+    fetchNews();
+    
+    // 每30秒刷新数据
+    setInterval(fetchNews, 30000);
+
+    // 添加滚动动画
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.style.opacity = 1;
+                entry.target.style.transform = 'translateY(0)';
             }
         });
+    }, { threshold: 0.1 });
 
-        // 容错处理
-        window.onerror = function(message, source, lineno, colno, error) {
-            debug.log(`全局错误: ${message} (${source}:${lineno})`);
-            return true;
-        };
-    </script>
-</body>
-</html>
+    document.querySelectorAll('.news-card').forEach(card => {
+        card.style.opacity = 0;
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.6s ease';
+        observer.observe(card);
+    });
+</script>
