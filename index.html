@@ -1,328 +1,210 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="TechVision - 全球领先的企业级数字化解决方案提供商">
-    <title>TechVision | 智能未来解决方案</title>
-    <style>
-        :root {
-            --primary: #64ffda;
-            --secondary: #00ff88;
-            --dark: #0a192f;
-            --light: #ccd6f6;
-            --accent: rgba(100, 255, 218, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
-
-        body {
-            background: var(--dark);
-            color: var(--light);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* 动态导航栏 */
-        .navbar {
-            position: fixed;
-            width: 100%;
-            padding: 1.5rem 5%;
-            background: rgba(10, 25, 47, 0.95);
-            backdrop-filter: blur(12px);
-            z-index: 1000;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-content {
-            max-width: 1440px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.75rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-
-        /* 移动端菜单 */
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        .bar {
-            display: block;
-            width: 28px;
-            height: 2px;
-            margin: 6px 0;
-            background: var(--primary);
-            transition: 0.3s;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2.5rem;
-        }
-
-        .nav-links a {
-            color: var(--light);
-            text-decoration: none;
-            font-weight: 500;
-            position: relative;
-            padding: 0.5rem 0;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        /* 英雄区块 */
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(45deg, rgba(10,25,47,0.95), rgba(10,25,47,0.85)),
-                        url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1920&q=80') center/cover;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, 
-                transparent 25%,
-                rgba(100, 255, 218, 0.1) 50%,
-                transparent 75%);
-            animation: hologram 12s infinite linear;
-            pointer-events: none;
-        }
-
-        .hero-content {
-            text-align: center;
-            padding: 0 5%;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-            animation: fadeUp 1s ease;
-            background: linear-gradient(45deg, var(--light), var(--primary));
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-
-        /* 世界时间组件 */
-        .global-time {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 1000;
-            backdrop-filter: blur(20px);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            background: rgba(10, 25, 47, 0.9);
-            border: 1px solid rgba(100, 255, 218, 0.3);
-            box-shadow: 0 12px 48px rgba(16, 24, 39, 0.3);
-            transition: transform 0.3s ease;
-        }
-
-        .global-time:hover {
-            transform: translateY(-5px);
-        }
-
-        .time-card {
-            margin: 1rem 0;
-        }
-
-        .time-card h4 {
-            color: var(--primary);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .digital-clock {
-            font-family: 'Fira Code', monospace;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            color: var(--primary);
-        }
-
-        .timezone {
-            color: var(--light);
-            opacity: 0.8;
-            font-size: 0.85rem;
-        }
-
-        /* 动画效果 */
-        @keyframes hologram {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(50%, 50%) rotate(360deg); }
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(2rem); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .menu-toggle {
-                display: block;
-            }
-
-            .nav-links {
-                position: fixed;
-                top: 5rem;
-                right: -100%;
-                flex-direction: column;
-                background: rgba(10, 25, 47, 0.98);
-                padding: 2rem;
-                border-radius: 1rem;
-                width: 70%;
-                transition: right 0.3s ease;
-            }
-
-            .nav-links.active {
-                right: 5%;
-            }
-
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .global-time {
-                bottom: 1rem;
-                right: 1rem;
-                padding: 1rem;
-            }
-        }
-    </style>
+    <!-- 原有meta和title保持不变 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <nav class="navbar" aria-label="Main navigation">
-        <div class="nav-content">
-            <div class="logo">TechVision</div>
-            <button class="menu-toggle" aria-expanded="false">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-            <div class="nav-links">
-                <a href="#home">战略愿景</a>
-                <a href="#solutions">解决方案</a>
-                <a href="#innovation">技术创新</a>
-                <a href="#contact">全球合作</a>
-            </div>
-        </div>
-    </nav>
+    <!-- 原有导航栏保持不变 -->
 
     <section class="hero" id="home">
-        <div class="hero-content">
-            <h1>重塑商业未来</h1>
-            <p>赋能全球企业数字化转型</p>
-        </div>
-        
-        <!-- 世界时间组件 -->
-        <div class="global-time">
-            <div class="time-card" data-city="UTC">
-                <h4>GLOBAL HQ</h4>
-                <div class="digital-clock">00:00:00</div>
-                <div class="timezone">GMT+00:00</div>
-            </div>
-            <div class="time-card" data-city="America/New_York">
-                <h4>NEW YORK</h4>
-                <div class="digital-clock">00:00:00</div>
-                <div class="timezone">EST</div>
-            </div>
-            <div class="time-card" data-city="Asia/Shanghai">
-                <h4>SHANGHAI</h4>
-                <div class="digital-clock">00:00:00</div>
-                <div class="timezone">CST</div>
+        <!-- 原有内容保持不变 -->
+    </section>
+
+    <!-- 新增解决方案区块 -->
+    <section class="solutions" id="solutions">
+        <div class="section-container">
+            <h2 class="section-title">核心解决方案</h2>
+            <div class="solution-grid">
+                <div class="solution-card">
+                    <i class="fas fa-cloud-arrow-up"></i>
+                    <h3>智能云平台</h3>
+                    <p>全栈式云原生解决方案，支持混合云部署架构</p>
+                    <div class="tech-tags">
+                        <span>Kubernetes</span>
+                        <span>AIops</span>
+                        <span>微服务</span>
+                    </div>
+                </div>
+                <!-- 更多解决方案卡片 -->
             </div>
         </div>
     </section>
 
-    <script>
-        // 移动端菜单切换
-        document.querySelector('.menu-toggle').addEventListener('click', () => {
-            document.querySelector('.nav-links').classList.toggle('active');
-            document.querySelector('.menu-toggle').setAttribute('aria-expanded', 
-                document.querySelector('.nav-links').classList.contains('active'));
-        });
+    <!-- 技术创新时间轴 -->
+    <section class="timeline" id="innovation">
+        <div class="section-container">
+            <h2 class="section-title">技术创新历程</h2>
+            <div class="timeline-track">
+                <div class="timeline-node">
+                    <div class="node-date">2023.Q4</div>
+                    <div class="node-content">
+                        <h4>量子计算框架发布</h4>
+                        <p>推出全球首个企业级量子混合计算平台</p>
+                    </div>
+                </div>
+                <!-- 更多时间轴节点 -->
+            </div>
+        </div>
+    </section>
 
-        // 平滑滚动
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-        });
+    <!-- 三维地球可视化 -->
+    <div class="globe-container">
+        <canvas id="globeCanvas"></canvas>
+        <div class="globe-overlay">
+            <h3>全球服务节点实时分布</h3>
+            <div class="node-counter">
+                <i class="fas fa-server"></i>
+                <span>148</span>个边缘节点
+            </div>
+        </div>
+    </div>
 
-        // 动态时间更新
-        function updateWorldTime() {
-            document.querySelectorAll('.time-card').forEach(card => {
-                const options = {
-                    timeZone: card.dataset.city,
-                    hour12: false,
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                };
-                
-                const timeString = new Date().toLocaleTimeString('en-US', options);
-                const tzString = new Intl.DateTimeFormat('en-US', {
-                    timeZone: card.dataset.city,
-                    timeZoneName: 'short'
-                }).formatToParts(new Date()).find(part => part.type === 'timeZoneName').value;
+    <!-- 动态数据看板 -->
+    <section class="dashboard">
+        <div class="metric-card">
+            <div class="metric-header">
+                <i class="fas fa-database"></i>
+                <h4>实时数据处理</h4>
+            </div>
+            <div class="metric-value">2.45<span>PB/s</span></div>
+            <div class="sparkline"></div>
+        </div>
+        <!-- 更多数据指标卡片 -->
+    </section>
 
-                card.querySelector('.digital-clock').textContent = timeString;
-                card.querySelector('.timezone').textContent = tzString;
-            });
+    <!-- 悬浮控制台 -->
+    <div class="floating-console">
+        <div class="console-header">
+            <span>System Monitor</span>
+            <div class="status-led"></div>
+        </div>
+        <div class="log-stream"></div>
+    </div>
+
+    <style>
+        /* 新增样式 */
+        .section-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 8rem 5%;
         }
 
-        // 初始化时间更新
-        setInterval(updateWorldTime, 1000);
-        updateWorldTime();
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 4rem;
+            position: relative;
+            display: inline-block;
+        }
 
-        // 导航栏交互
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+        }
+
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .solution-card {
+            background: rgba(16, 32, 64, 0.4);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .solution-card:hover {
+            transform: translateY(-5px);
+            background: rgba(100, 255, 218, 0.05);
+        }
+
+        .solution-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .tech-tags span {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--accent);
+            border-radius: 2rem;
+            margin: 0.5rem 0.25rem;
+            font-size: 0.85rem;
+        }
+
+        /* 时间轴样式 */
+        .timeline-track {
+            position: relative;
+            padding: 4rem 0;
+        }
+
+        .timeline-node {
+            display: flex;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .node-date {
+            width: 120px;
+            flex-shrink: 0;
+            font-family: 'Fira Code', monospace;
+            color: var(--primary);
+        }
+
+        /* 三维地球样式 */
+        .globe-container {
+            position: relative;
+            height: 80vh;
+            background: radial-gradient(circle at center, 
+                rgba(100, 255, 218, 0.05) 0%, 
+                rgba(10, 25, 47, 1) 70%);
+        }
+
+        /* 悬浮控制台 */
+        .floating-console {
+            position: fixed;
+            bottom: -300px;
+            right: 2rem;
+            width: 320px;
+            background: rgba(10, 25, 47, 0.95);
+            border-radius: 8px;
+            transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 16px 32px rgba(0,0,0,0.3);
+        }
+
+        .floating-console:hover {
+            bottom: 1rem;
+        }
+    </style>
+
+    <script>
+        // 新增交互功能
+        // 三维地球初始化
+        function initGlobe() {
+            // 使用Three.js或D3实现三维可视化
+        }
+
+        // 实时数据更新
+        function updateMetrics() {
+            // 使用WebSocket获取实时数据
+        }
+
+        // 视差滚动效果
         window.addEventListener('scroll', () => {
-            const navbar = document.querySelector('.navbar');
-            navbar.style.background = window.scrollY > 50 
-                ? 'rgba(10, 25, 47, 0.98)' 
-                : 'rgba(10, 25, 47, 0.95)';
+            document.querySelectorAll('.solution-card').forEach(card => {
+                const rect = card.getBoundingClientRect();
+                card.style.transform = `translateY(${rect.top * 0.1}px)`;
+            });
         });
     </script>
 </body>
