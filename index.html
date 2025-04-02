@@ -1,181 +1,139 @@
-<!-- 在 </section class="hero"> 之后添加新闻板块 -->
-<section class="news-section" id="news">
-    <div class="news-container">
-        <h2 class="section-title">实时要闻</h2>
-        <div class="news-grid" id="weiboNews"></div>
-    </div>
-</section>
-
-<style>
-    /* 新增新闻板块样式 */
-    .news-section {
-        padding: 8rem 5%;
-        background: rgba(10, 25, 47, 0.95);
-    }
-
-    .section-title {
-        font-size: 2.5rem;
-        background: linear-gradient(45deg, var(--primary), var(--secondary));
-        -webkit-background-clip: text;
-        color: transparent;
-        margin-bottom: 3rem;
-        text-align: center;
-        animation: fadeUp 1s ease;
-    }
-
-    .news-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .news-card {
-        background: rgba(17, 34, 64, 0.7);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        backdrop-filter: blur(10px);
-        border: 1px solid var(--primary);
-        transition: transform 0.3s ease;
-    }
-
-    .news-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .news-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid rgba(100, 255, 218, 0.2);
-    }
-
-    .news-platform {
-        color: var(--primary);
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .news-time {
-        color: var(--light);
-        opacity: 0.8;
-        font-size: 0.8rem;
-    }
-
-    .news-title {
-        font-size: 1.1rem;
-        line-height: 1.5;
-        margin-bottom: 1rem;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .news-stats {
-        display: flex;
-        gap: 1.5rem;
-        color: var(--light);
-        opacity: 0.8;
-        font-size: 0.9rem;
-    }
-
-    .hot-tag {
-        background: rgba(255, 86, 86, 0.2);
-        color: #ff5656;
-        padding: 0.2rem 0.8rem;
-        border-radius: 1rem;
-        font-size: 0.8rem;
-    }
-
-    @media (max-width: 768px) {
-        .news-section {
-            padding: 4rem 5%;
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全球实时要闻聚合</title>
+    <style>
+        :root {
+            --primary: #64ffda;
+            --secondary: #00ff88;
+            --dark: #0a192f;
+            --light: #ccd6f6;
         }
-        
+
+        .news-container {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 20px;
+        }
+
         .section-title {
-            font-size: 2rem;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 2rem;
         }
-    }
-</style>
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .news-card {
+            background: rgba(17, 34, 64, 0.7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .news-source {
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .news-title {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--light);
+            opacity: 0.8;
+            font-size: 0.85rem;
+        }
+
+        .hot-tag {
+            background: rgba(255, 86, 86, 0.2);
+            color: #ff5656;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="news-container">
+        <h2 class="section-title">全球实时要闻</h2>
+        <div class="news-grid" id="newsGrid">
+            <div class="loading">正在加载全球新闻...</div>
+        </div>
+    </div>
 
 <script>
-    // 模拟微博新闻API数据
-    const mockWeiboNews = [
-        {
-            id: 1,
-            title: "联合国点赞中国新能源发展",
-            reads: 1296000,
-            comments: 21000,
-            time: "2024-04-02T15:30:00",
-            hot: true
-        },
-        {
-            id: 2,
-            title: "东都战区再发军事行动海报",
-            reads: 893000,
-            comments: 14000,
-            time: "2024-04-02T15:25:00"
-        },
-        // 更多模拟数据...
-    ];
+// 获取Reddit新闻（无需API密钥）
+async function fetchNews() {
+    try {
+        const subreddits = ['worldnews', 'technology', 'news'];
+        const promises = subreddits.map(sub => 
+            fetch(`https://www.reddit.com/r/${sub}/top.json?limit=5`)
+                .then(res => res.json())
+        );
 
-    // 渲染新闻卡片
-    function renderNews(newsData) {
-        const container = document.getElementById('weiboNews');
-        container.innerHTML = newsData.map(item => `
-            <div class="news-card">
-                <div class="news-header">
-                    <span class="news-platform">微博热搜</span>
-                    <span class="news-time">${new Date(item.time).toLocaleTimeString('zh-CN')}</span>
-                </div>
-                ${item.hot ? '<span class="hot-tag">爆</span>' : ''}
-                <h3 class="news-title">${item.title}</h3>
-                <div class="news-stats">
-                    <span>阅读 ${formatNumber(item.reads)}</span>
-                    <span>讨论 ${formatNumber(item.comments)}</span>
-                </div>
+        const results = await Promise.all(promises);
+        const allPosts = results.flatMap(res => 
+            res.data.children.map(post => ({
+                title: post.data.title,
+                url: `https://reddit.com${post.data.permalink}`,
+                source: `r/${post.data.subreddit}`,
+                upvotes: post.data.ups,
+                comments: post.data.num_comments,
+                created: post.data.created_utc
+            }))
+        );
+
+        renderNews(allPosts.sort((a,b) => b.upvotes - a.upvotes).slice(0, 15));
+    } catch (error) {
+        document.getElementById('newsGrid').innerHTML = `
+            <div class="error">
+                ❌ 新闻加载失败，请<a href="javascript:location.reload()">刷新重试</a>
             </div>
-        `).join('');
+        `;
     }
+}
 
-    // 数字格式化
-    function formatNumber(num) {
-        return num >= 10000 ? `${(num/10000).toFixed(1)}万` : num;
-    }
+// 渲染新闻卡片
+function renderNews(posts) {
+    const container = document.getElementById('newsGrid');
+    container.innerHTML = posts.map(post => `
+        <a href="${post.url}" target="_blank" class="news-card">
+            <div class="news-source">${post.source}</div>
+            <h3 class="news-title">${post.title}</h3>
+            <div class="news-meta">
+                <span>▲ ${post.upvotes.toLocaleString()}</span>
+                <span>💬 ${post.comments.toLocaleString()}</span>
+                <span>${new Date(post.created*1000).toLocaleDateString()}</span>
+            </div>
+            ${post.upvotes > 10000 ? '<span class="hot-tag">热门</span>' : ''}
+        </a>
+    `).join('');
+}
 
-    // 模拟实时更新
-    let currentPage = 1;
-    function fetchNews() {
-        // 模拟API分页请求
-        const newNews = mockWeiboNews.slice((currentPage-1)*3, currentPage*3);
-        renderNews(newNews);
-        currentPage = currentPage > 1 ? 1 : currentPage+1;
-    }
+// 初始化加载
+fetchNews();
 
-    // 初始加载
-    fetchNews();
-    
-    // 每30秒刷新数据
-    setInterval(fetchNews, 30000);
-
-    // 添加滚动动画
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if(entry.isIntersecting) {
-                entry.target.style.opacity = 1;
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.news-card').forEach(card => {
-        card.style.opacity = 0;
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'all 0.6s ease';
-        observer.observe(card);
-    });
+// 每5分钟刷新
+setInterval(fetchNews, 300000);
 </script>
+</body>
+</html>
