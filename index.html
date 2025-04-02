@@ -3,224 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Feed 量子信息流</title>
+    <title>Quantum Feed 量子战术情报系统</title>
     <style>
         :root {
             --quantum-blue: #00f3ff;
-            --neon-purple: #bc13fe;
-            --hologram-layer: rgba(188, 19, 254, 0.15);
-            --tactical-black: #0a0c17;
+            --tactical-purple: #bc13fe;
+            --neon-matrix: #0aff0a;
+            --deep-space: #0a0c17;
         }
 
         body {
-            background: radial-gradient(circle at 50% 100%, 
-                var(--tactical-black) 60%, 
+            background: radial-gradient(ellipse at bottom, 
+                var(--deep-space) 0%, 
                 #1a1d2e 100%);
             color: #fff;
-            font-family: 'QuantumDisplay', sans-serif;
+            font-family: 'QuantumConsole', monospace;
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* 量子时钟系统 */
-        .chrono-interface {
-            position: fixed;
-            top: 5%;
-            right: 5%;
-            padding: 1.5rem 3rem;
-            background: linear-gradient(145deg,
-                rgba(11, 13, 28, 0.95),
-                rgba(22, 25, 49, 0.85));
-            border-radius: 16px;
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--quantum-blue);
-            box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
-            z-index: 1000;
-            transform: perspective(1000px) rotateX(5deg);
+        /* 战术全息仪表盘 */
+        .tactical-dashboard {
+            display: grid;
+            grid-template-columns: 1.2fr 2fr;
+            gap: 2rem;
+            padding: 3rem 8%;
+            height: 100vh;
         }
 
-        .quantum-time {
-            font-size: 3.5rem;
-            background: linear-gradient(135deg, 
-                var(--quantum-blue) 20%,
-                var(--neon-purple) 80%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            letter-spacing: -3px;
-            text-shadow: 0 0 30px rgba(188, 19, 254, 0.4);
+        /* 量子时钟系统 */
+        .chrono-module {
+            background: linear-gradient(215deg,
+                rgba(11, 13, 28, 0.95),
+                rgba(22, 25, 49, 0.85));
+            border: 1px solid var(--quantum-blue);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(25px);
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.15);
             position: relative;
         }
 
-        .quantum-time::after {
-            content: '';
-            position: absolute;
-            inset: -10px;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent 0%,
-                var(--hologram-layer) 5%,
-                transparent 10%
-            );
-            z-index: -1;
-            animation: quantum-glow 3s linear infinite;
+        .quantum-time {
+            font-size: 4rem;
+            background: linear-gradient(135deg, 
+                var(--quantum-blue) 20%,
+                var(--tactical-purple) 80%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            letter-spacing: -3px;
+            margin-bottom: 1rem;
         }
 
-        /* 战术信息流 */
-        .tactical-feed {
-            position: fixed;
-            bottom: 8%;
-            left: 8%;
-            right: 8%;
+        .quantum-date {
+            color: var(--neon-matrix);
+            font-family: 'QuantumMono', monospace;
+            border-top: 1px solid rgba(188, 19, 254, 0.3);
+            padding-top: 1rem;
+        }
+
+        /* 战术情报流 */
+        .intel-feed {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-rows: auto 1fr;
             gap: 2rem;
-            perspective: 1500px;
         }
 
-        .data-card {
+        .intel-matrix {
             background: linear-gradient(325deg,
                 rgba(16, 18, 37, 0.95),
                 rgba(26, 29, 54, 0.9));
+            border: 1px solid var(--tactical-purple);
+            border-radius: 16px;
             padding: 2rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            transform-style: preserve-3d;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: tactical-grab;
+            position: relative;
+            overflow: hidden;
         }
 
-        .data-card:hover {
-            transform: translateY(-10px) rotateX(5deg);
-            box-shadow: 0 25px 60px rgba(0, 243, 255, 0.15);
+        .intel-card {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .event-header {
+        .intel-card:hover {
+            background: rgba(0, 243, 255, 0.05);
+            transform: translateX(10px);
+        }
+
+        .intel-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(188, 19, 254, 0.2);
+            margin-bottom: 1rem;
         }
 
-        .event-tag {
+        .threat-level {
             background: linear-gradient(90deg, 
                 var(--quantum-blue),
-                var(--neon-purple));
+                var(--tactical-purple));
             padding: 0.3rem 1.2rem;
             border-radius: 20px;
             font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
-        .event-timeline {
-            color: var(--quantum-blue);
-            font-family: 'QuantumMono', monospace;
-        }
-
-        .event-content {
+        .intel-content {
             line-height: 1.6;
-            font-size: 1.1rem;
-            background: linear-gradient(45deg, #fff, #c6d4ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: rgba(255,255,255,0.9);
+            position: relative;
+            padding-left: 1.5rem;
         }
 
-        @keyframes quantum-glow {
-            0% { opacity: 0.2; transform: translate(-15%, -15%); }
-            50% { opacity: 0.8; }
-            100% { opacity: 0.2; transform: translate(15%, 15%); }
+        .intel-content::before {
+            content: '▶';
+            color: var(--neon-matrix);
+            position: absolute;
+            left: 0;
+            animation: pulse 1s infinite;
+        }
+
+        /* 实时数据侧边栏 */
+        .data-sidebar {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .sensor-module {
+            background: rgba(16, 18, 37, 0.8);
+            border: 1px solid var(--quantum-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <!-- 量子时钟 -->
-    <div class="chrono-interface">
-        <div class="quantum-time">
-            <span id="q-hours">03</span>:<span id="q-minutes">45</span>:<span id="q-seconds">14</span>
-        </div>
-        <div class="event-timeline">2025-04-03 | QUANTUM-18</div>
-    </div>
-
-    <!-- 战术信息流 -->
-    <div class="tactical-feed">
-        <div class="data-card">
-            <div class="event-header">
-                <div class="event-tag">POLITICAL IMPACT</div>
-                <div class="event-timeline">ALPHA-0327</div>
+    <div class="tactical-dashboard">
+        <!-- 数据侧边栏 -->
+        <div class="data-sidebar">
+            <div class="chrono-module">
+                <div class="quantum-time">03:50:26</div>
+                <div class="quantum-date">2025-04-08 | QUANTUM-13</div>
             </div>
-            <div class="event-content">
-                Susan Crawford当选威斯康星最高法院大法官，马斯克表示将通过Neuralink法律矩阵发起量子态司法挑战
+            
+            <div class="sensor-module">
+                <h3 class="threat-level">NETWORK STATUS</h3>
+                <div class="sensor-data">
+                    <div class="sensor-item">量子加密通道: ██████ 98%</div>
+                    <div class="sensor-item">数据吞吐量: 24.7TB/s</div>
+                    <div class="sensor-item">威胁指数: LEVEL 2</div>
+                </div>
             </div>
         </div>
 
-        <!-- 更多数据卡片 -->
-        <div class="data-card">
-            <div class="event-header">
-                <div class="event-tag">TECH BREACH</div>
-                <div class="event-timeline">BETA-1158</div>
+        <!-- 情报主界面 -->
+        <div class="intel-feed">
+            <div class="intel-matrix">
+                <div class="intel-card">
+                    <div class="intel-header">
+                        <div class="threat-level">POLITICAL IMPACT</div>
+                        <div class="event-code">ALPHA-0827</div>
+                    </div>
+                    <div class="intel-content">
+                        Susan Crawford当选威斯康星最高法院大法官，马斯克宣布启动Neuralink法律矩阵的量子司法协议
+                    </div>
+                </div>
+
+                <div class="intel-card">
+                    <div class="intel-header">
+                        <div class="threat-level">TECH BREACH</div>
+                        <div class="event-code">BETA-1158</div>
+                    </div>
+                    <div class="intel-content">
+                        特斯拉量子网络检测到非常规数据波动，新型AI协议成功突破RSA-4096加密矩阵，安全团队已启动量子纠缠防御协议
+                    </div>
+                </div>
             </div>
-            <div class="event-content">
-                特斯拉量子网络检测到非常规数据波动，疑似新型AI协议突破传统加密矩阵
+
+            <!-- 实时数据图表 -->
+            <div class="intel-matrix">
+                <div class="threat-level">THREAT PATTERN ANALYSIS</div>
+                <div id="quantum-chart"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // 量子时间系统
-        class QuantumChronometer {
+        // 量子实时数据系统
+        class QuantumFeed {
             constructor() {
-                this.precision = 100; // 100ms精度
-                this.timeElements = {
-                    hours: document.getElementById('q-hours'),
-                    minutes: document.getElementById('q-minutes'),
-                    seconds: document.getElementById('q-seconds')
-                }
+                this.ws = new WebSocket('wss://quantum-feed.tld/v3');
+                this.cache = new Map();
             }
 
             init() {
-                this.update();
-                setInterval(() => this.update(), this.precision);
+                this.ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.processData(data);
+                }
             }
 
-            update() {
-                const now = new Date();
-                this.timeElements.hours.textContent = now.getHours().toString().padStart(2, '0');
-                this.timeElements.minutes.textContent = now.getMinutes().toString().padStart(2, '0');
-                this.timeElements.seconds.textContent = now.getSeconds().toString().padStart(2, '0');
+            processData(data) {
+                const cardTemplate = document.createElement('div');
+                cardTemplate.className = 'intel-card';
+                cardTemplate.innerHTML = `
+                    <div class="intel-header">
+                        <div class="threat-level">${data.category}</div>
+                        <div class="event-code">${data.code}</div>
+                    </div>
+                    <div class="intel-content">${data.content}</div>
+                `;
+                
+                document.querySelector('.intel-matrix').prepend(cardTemplate);
+                this.cleanCache();
+            }
+
+            cleanCache() {
+                // 量子态缓存清理算法
+                if(this.cache.size > 20) {
+                    const oldestKey = [...this.cache.keys()][0];
+                    this.cache.delete(oldestKey);
+                }
             }
         }
 
-        // 动态视差系统
-        document.addEventListener('mousemove', (e) => {
-            const cards = document.querySelectorAll('.data-card');
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
+        // 初始化量子数据流
+        const quantumFeed = new QuantumFeed();
+        quantumFeed.init();
+
+        // 动态时间更新
+        function updateTacticalTime() {
+            const now = new Date();
+            document.querySelector('.quantum-time').textContent = 
+                `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
             
-            cards.forEach(card => {
-                const rect = card.getBoundingClientRect();
-                const cardX = rect.left + rect.width/2;
-                const cardY = rect.top + rect.height/2;
-                
-                const deltaX = (e.clientX - cardX) / 30;
-                const deltaY = (e.clientY - cardY) / 30;
-
-                card.style.transform = `
-                    perspective(1500px)
-                    rotateX(${deltaY * 0.5}deg)
-                    rotateY(${deltaX * 0.5}deg)
-                    translateZ(30px)
-                `;
-            });
-        });
-
-        // 初始化量子系统
-        const qClock = new QuantumChronometer();
-        document.addEventListener('DOMContentLoaded', () => {
-            qClock.init();
-            document.body.classList.add('quantum-loaded');
-        });
+            document.querySelector('.quantum-date').textContent = 
+                `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')} | QUANTUM-${Math.floor(Math.random()*20)}`;
+        }
+        setInterval(updateTacticalTime, 1000);
     </script>
 </body>
 </html>
