@@ -3,136 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechVision 企业门户</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <title>TechVision 全球态势感知系统</title>
     <style>
         :root {
             --primary: #64ffda;
             --secondary: #00ff88;
             --dark: #0a192f;
-            --light: #ffffff; /* 字体颜色改为白色 */
+            --light: #ffffff;
         }
 
-        /* 全息时钟样式 */
+        /* 全息时钟系统 */
         .hologram-clock {
             position: fixed;
             top: 120px;
             right: 5%;
-            z-index: 999;
-            padding: 1.5rem 2rem;
+            padding: 1.5rem 2.5rem;
             border-radius: 16px;
-            background: rgba(16, 34, 64, 0.6);
+            background: rgba(16, 34, 64, 0.95);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(100, 255, 218, 0.3);
-            box-shadow: 0 8px 32px rgba(16, 24, 39, 0.3);
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 40px rgba(100, 255, 218, 0.1);
             font-family: 'Fira Code', monospace;
+            z-index: 999;
         }
 
         .time-display {
-            font-size: 2.8rem;
-            background: linear-gradient(135deg, var(--primary) 30%, var(--secondary) 70%);
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 0 15px rgba(100, 255, 218, 0.4);
+            letter-spacing: -3px;
+            text-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
         }
 
-        /* 实时新闻模块 */
-        .news-section {
-            padding: 8rem 5%;
-            background: linear-gradient(45deg, 
-                rgba(10, 25, 47, 0.97), 
-                rgba(16, 36, 70, 0.95));
-            min-height: 100vh;
+        .date-display {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            text-align: right;
+            margin-top: 0.8rem;
         }
 
-        .news-card {
-            background: linear-gradient(145deg, 
-                rgba(17, 34, 64, 0.8),
-                rgba(10, 25, 47, 0.9));
-            border: 1px solid;
-            border-image: linear-gradient(45deg, rgba(100, 255, 218, 0.3), transparent) 1;
-            color: var(--light);
+        /* 实时新闻矩阵 */
+        .news-matrix {
+            position: fixed;
+            bottom: 5%;
+            left: 5%;
+            right: 5%;
+            background: rgba(10, 25, 47, 0.95);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 12px 48px rgba(16, 24, 39, 0.3);
         }
 
-        /* 完整样式需保留原有企业站设计 */
-        /* ...原有导航栏、英雄区块等样式保持不变... */
+        .news-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .news-item:hover {
+            background: rgba(17, 34, 64, 0.6);
+            transform: translateX(10px);
+        }
     </style>
 </head>
 <body>
-    <!-- 导航栏 -->
-    <nav class="navbar">...</nav>
-
     <!-- 全息时钟 -->
     <div class="hologram-clock">
         <div class="time-display">
-            <span class="hours">00</span>:
-            <span class="minutes">00</span>:
-            <span class="seconds">00</span>
+            <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
         </div>
-        <div class="date-display">2024-04-02 UTC+8</div>
+        <div class="date-display">
+            <span id="year">2024</span>-<span id="month">04</span>-<span id="day">02</span>
+            <span id="timezone">UTC+8</span>
+        </div>
     </div>
 
-    <!-- 英雄区块 -->
-    <section class="hero">...</section>
-
-    <!-- 实时新闻模块 -->
-    <section class="news-section">
-        <div class="news-container">
-            <h2 class="section-title">全球实时要闻</h2>
-            <div class="news-grid" id="newsGrid">
-                <!-- 新闻内容动态加载 -->
+    <!-- 实时新闻矩阵 -->
+    <div class="news-matrix">
+        <div class="news-item">
+            <div class="news-header">
+                <span class="news-tag"># 战略动态</span>
+                <span class="news-time">03:36:47</span>
             </div>
+            <div class="news-content">Susan Crawford当选威斯康星最高法院大法官，马斯克表示将发起法律挑战</div>
         </div>
-    </section>
+        <!-- 更多新闻项... -->
+    </div>
 
     <script>
-        // 高精度时钟系统
-        class PrecisionClock {
+        // 高精度时间同步系统
+        class ChronosSystem {
+            constructor() {
+                this.interval = 1000;
+                this.elements = {
+                    hours: document.getElementById('hours'),
+                    minutes: document.getElementById('minutes'),
+                    seconds: document.getElementById('seconds'),
+                    year: document.getElementById('year'),
+                    month: document.getElementById('month'),
+                    day: document.getElementById('day'),
+                    timezone: document.getElementById('timezone')
+                }
+            }
+
+            init() {
+                this.update();
+                setInterval(() => this.update(), this.interval);
+            }
+
             update() {
                 const now = new Date();
-                // 更新时间显示逻辑
-            }
-        }
-
-        // Reddit新闻聚合系统
-        class NewsAggregator {
-            async fetchNews() {
-                const subreddits = ['worldnews', 'technology', 'news'];
-                // API请求与数据处理逻辑
-            }
-
-            render(newsItems) {
-                // 动态生成新闻卡片
-                document.getElementById('newsGrid').innerHTML = newsItems.map(item => `
-                    <div class="news-card">
-                        <div class="news-header">
-                            <span class="news-source">${item.source}</span>
-                            ${item.hot ? '<span class="hot-tag">TRENDING</span>' : ''}
-                        </div>
-                        <h3 class="news-title">${item.title}</h3>
-                        <div class="news-stats">
-                            <span>▲ ${item.upvotes}</span>
-                            <span>💬 ${item.comments}</span>
-                            <span>${item.date}</span>
-                        </div>
-                    </div>
-                `).join('');
+                const tzOffset = -now.getTimezoneOffset()/60;
+                
+                this.elements.hours.textContent = now.getHours().toString().padStart(2, '0');
+                this.elements.minutes.textContent = now.getMinutes().toString().padStart(2, '0');
+                this.elements.seconds.textContent = now.getSeconds().toString().padStart(2, '0');
+                
+                this.elements.year.textContent = now.getFullYear();
+                this.elements.month.textContent = (now.getMonth()+1).toString().padStart(2, '0');
+                this.elements.day.textContent = now.getDate().toString().padStart(2, '0');
+                this.elements.timezone.textContent = `UTC${tzOffset >= 0 ? '+' : ''}${tzOffset}`;
             }
         }
 
         // 初始化系统
-        const clock = new PrecisionClock();
-        const news = new NewsAggregator();
+        const chronos = new ChronosSystem();
+        document.addEventListener('DOMContentLoaded', () => chronos.init());
 
-        document.addEventListener('DOMContentLoaded', () => {
-            clock.init();
-            news.init();
-        });
-
-        // 性能优化：页面可见性检测
+        // 可见性状态管理
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) news.refresh();
+            if (document.hidden) {
+                clearInterval(chronos.interval);
+            } else {
+                chronos.init();
+            }
         });
     </script>
 </body>
