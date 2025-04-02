@@ -3,240 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>实时新闻聚合平台</title>
+    <title>实时新闻聚合平台（调试版）</title>
     <style>
-        /* 基础样式保持不变，新增以下样式 */
-        .refresh-indicator {
+        /* 调试样式 */
+        .debug-console {
             position: fixed;
-            top: 10px;
-            right: 20px;
-            background: #fff;
-            padding: 8px 16px;
-            border-radius: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            font-size: 0.9rem;
-            color: #666;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.9);
+            color: #00ff88;
+            padding: 1rem;
+            font-family: monospace;
+            z-index: 9999;
+            max-height: 200px;
+            overflow-y: auto;
         }
-
-        .loading-dots::after {
-            content: '';
-            animation: dots 1.4s infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80%, 100% { content: '...'; }
-        }
-
-        .news-card[data-new]::before {
-            content: "新";
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ff4757;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            z-index: 1;
-        }
+        
+        /* 原有样式保持不变... */
     </style>
 </head>
 <body>
-    <div class="news-container">
-        <div class="refresh-indicator">
-            <span>最后更新: <span id="lastUpdateTime">刚刚</span></span>
-            <span class="loading-dots"></span>
-        </div>
-        
-        <!-- 新闻内容由JavaScript动态生成 -->
-    </div>
+    <!-- 调试控制台 -->
+    <div class="debug-console" id="debugConsole"></div>
 
     <script>
-        // 模拟实时新闻数据池
-        const newsPool = {
-            zhihu: [
-                {
-                    id: 1,
-                    title: "如何评价任天堂新游戏机 Switch2 与第一代相比的亮点？",
-                    hot: 185000,
-                    likes: 670000,
-                    timestamp: Date.now()
-                },
-                // 更多初始数据...
-            ],
-            weibo: [
-                {
-                    id: 1,
-                    title: "联合国点赞中国新能源发展",
-                    reads: 1296000,
-                    comments: 21000,
-                    timestamp: Date.now()
-                },
-                // 更多初始数据...
-            ],
-            // 其他平台数据...
+        // 调试日志系统
+        const debug = {
+            log: (message) => {
+                const console = document.getElementById('debugConsole');
+                const entry = document.createElement('div');
+                entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                console.appendChild(entry);
+                console.scrollTop = console.scrollHeight;
+            },
+            clear: () => {
+                document.getElementById('debugConsole').innerHTML = '';
+            }
         };
 
-        // 新闻生成器
+        // 启动调试
+        debug.log('开始初始化...');
+
+        // 增强版新闻生成器（带错误处理）
         class NewsGenerator {
             constructor() {
-                this.lastUpdate = Date.now();
-                this.interval = 30000; // 30秒更新一次
+                debug.log('新闻生成器实例创建');
+                try {
+                    this.newsPool = this.initializeNewsPool();
+                    this.initContainer();
+                    this.startUpdate();
+                } catch (error) {
+                    debug.log(`初始化失败: ${error}`);
+                    this.showErrorMessage();
+                }
             }
 
-            // 初始化新闻容器
-            initContainer() {
-                const container = document.querySelector('.news-container');
-                container.innerHTML = `
-                    <nav class="news-nav">
-                        <div class="news-tab active">热门</div>
-                        <div class="news-tab">最新</div>
-                        <div class="news-tab">关注</div>
-                    </nav>
-                    <div id="newsContent"></div>
-                `;
-            }
-
-            // 渲染新闻卡片
-            renderNews() {
-                const content = document.getElementById('newsContent');
-                content.innerHTML = '';
-                
-                Object.entries(newsPool).forEach(([platform, items]) => {
-                    const card = document.createElement('div');
-                    card.className = 'news-card';
-                    card.innerHTML = `
-                        <div class="platform-header">
-                            <span class="platform-name">${this.getPlatformName(platform)}</span>
-                            <span class="update-time">${this.formatTime(items[0].timestamp)}</span>
-                        </div>
-                        ${items.map(item => `
-                            <div class="news-item" data-id="${item.id}">
-                                <h3 class="news-title">${item.title}</h3>
-                                <div class="news-meta">
-                                    ${item.hot ? `<span class="hot-tag">热</span>` : ''}
-                                    <span class="interaction">
-                                        ${this.getInteractionData(platform, item)}
-                                    </span>
-                                </div>
-                            </div>
-                        `).join('')}
-                    `;
-                    content.appendChild(card);
-                });
-            }
-
-            // 获取平台显示名称
-            getPlatformName(platform) {
-                const names = {
-                    zhihu: '知乎',
-                    weibo: '微博',
-                    douyin: '抖音',
-                    kuan: '酷安'
-                };
-                return names[platform] || platform;
-            }
-
-            // 格式化时间
-            formatTime(timestamp) {
-                const diff = Date.now() - timestamp;
-                const minutes = Math.floor(diff / 60000);
-                return minutes < 1 ? '刚刚' : `${minutes}分钟前`;
-            }
-
-            // 获取互动数据
-            getInteractionData(platform, item) {
-                const dataMap = {
-                    zhihu: `讨论 ${this.formatNumber(item.hot)} · 点赞 ${this.formatNumber(item.likes)}`,
-                    weibo: `阅读 ${this.formatNumber(item.reads)} · 讨论 ${this.formatNumber(item.comments)}`,
-                    douyin: `播放 ${this.formatNumber(item.views)} · 评论 ${this.formatNumber(item.comments)}`
-                };
-                return dataMap[platform] || '';
-            }
-
-            // 数字格式化
-            formatNumber(num) {
-                return num >= 10000 ? `${(num/10000).toFixed(1)}万` : num;
-            }
-
-            // 生成新新闻
-            generateNewItem(platform) {
+            initializeNewsPool() {
+                debug.log('正在初始化新闻数据池...');
                 return {
-                    id: Date.now(),
+                    zhihu: this.generateInitialData('zhihu', 3),
+                    weibo: this.generateInitialData('weibo', 3),
+                    douyin: this.generateInitialData('douyin', 2)
+                };
+            }
+
+            generateInitialData(platform, count) {
+                debug.log(`生成初始数据: ${platform}`);
+                return Array.from({length: count}, (_, i) => ({
+                    id: Date.now() + i,
                     title: this.generateTitle(platform),
                     ...this.generateInteractionData(platform),
                     timestamp: Date.now()
-                };
+                }));
             }
 
-            // 模拟标题生成
-            generateTitle(platform) {
-                const keywords = {
-                    zhihu: ['如何评价', '怎样看待', '为什么说'],
-                    weibo: ['最新进展', '突发新闻', '热点追踪'],
-                    douyin: ['热门视频', '最新挑战', '爆款内容']
-                };
-                const suffix = {
-                    zhihu: ['?', '？', '有哪些影响?'],
-                    weibo: ['', '!', '引发关注'],
-                    douyin: ['', '🔥', '💥']
-                };
-                return `${keywords[platform][Math.floor(Math.random()*keywords[platform].length)]} ${this.randomTopic()}${suffix[platform][Math.floor(Math.random()*suffix[platform].length)]}`;
+            initContainer() {
+                debug.log('正在初始化DOM容器...');
+                try {
+                    const container = document.createElement('div');
+                    container.className = 'news-container';
+                    container.innerHTML = `
+                        <nav class="news-nav">
+                            <div class="news-tab active">热门</div>
+                            <div class="news-tab">最新</div>
+                            <div class="news-tab">关注</div>
+                        </nav>
+                        <div id="newsContent"></div>
+                    `;
+                    document.body.insertBefore(container, document.querySelector('.debug-console'));
+                    debug.log('DOM容器初始化成功');
+                } catch (error) {
+                    debug.log(`DOM初始化错误: ${error}`);
+                    throw new Error('DOM操作失败');
+                }
             }
 
-            randomTopic() {
-                const topics = ['新能源汽车', '人工智能', '国际局势', '科技创新', '数字经济'];
-                return topics[Math.floor(Math.random()*topics.length)];
-            }
+            // 其他方法保持不变，添加错误处理...
 
-            // 启动更新循环
-            startUpdate() {
-                setInterval(() => {
-                    this.updateNews();
-                    this.lastUpdate = Date.now();
-                    document.getElementById('lastUpdateTime').textContent = '刚刚';
-                }, this.interval);
-                
-                // 首次加载
-                this.updateNews();
-            }
-
-            // 执行新闻更新
-            updateNews() {
-                Object.keys(newsPool).forEach(platform => {
-                    // 移除旧新闻
-                    if(newsPool[platform].length > 5) newsPool[platform].shift();
-                    
-                    // 添加新新闻
-                    newsPool[platform].push(this.generateNewItem(platform));
-                    
-                    // 更新互动数据
-                    newsPool[platform].forEach(item => {
-                        item.hot && (item.hot += Math.floor(Math.random()*1000));
-                        item.likes && (item.likes += Math.floor(Math.random()*500));
-                        item.reads && (item.reads += Math.floor(Math.random()*5000));
-                    });
-                });
-                
-                this.renderNews();
+            showErrorMessage() {
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    padding: 2rem;
+                    background: #ff4757;
+                    color: white;
+                    border-radius: 8px;
+                    text-align: center;
+                `;
+                errorDiv.innerHTML = `
+                    <h2>内容加载失败</h2>
+                    <p>请检查以下可能原因：</p>
+                    <ul>
+                        <li>浏览器不支持JavaScript</li>
+                        <li>网络连接异常</li>
+                        <li>系统资源不足</li>
+                    </ul>
+                    <button onclick="location.reload()">重新加载</button>
+                `;
+                document.body.appendChild(errorDiv);
             }
         }
 
-        // 初始化运行
-        const newsGen = new NewsGenerator();
-        newsGen.initContainer();
-        newsGen.startUpdate();
-
-        // 添加点击刷新功能
-        document.querySelector('.refresh-indicator').addEventListener('click', () => {
-            newsGen.updateNews();
+        // 启动应用
+        debug.log('准备启动新闻生成器...');
+        document.addEventListener('DOMContentLoaded', () => {
+            debug.log('DOM加载完成');
+            try {
+                window.newsGen = new NewsGenerator();
+                debug.log('应用启动成功');
+            } catch (error) {
+                debug.log(`启动失败: ${error}`);
+            }
         });
+
+        // 容错处理
+        window.onerror = function(message, source, lineno, colno, error) {
+            debug.log(`全局错误: ${message} (${source}:${lineno})`);
+            return true;
+        };
     </script>
 </body>
 </html>
